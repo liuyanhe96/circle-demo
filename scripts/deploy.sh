@@ -6,7 +6,7 @@ set -e
 
 # 打印当前的工作路径
 pwd
-# 设置远程仓库地址q
+# 设置远程仓库地址 =周围不能有空格！！
 remote=$(git config remote.origin.url)
 
 echo 'remote is: '$remote
