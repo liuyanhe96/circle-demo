@@ -1,19 +1,41 @@
 version: 2
 jobs:
   build:
+#    告诉circleci需要什么样的环境
     docker:
       - image: circleci/node:10
     branches:
       only:
         - master
     steps:
+#      配置了ssh_key,可以去拉取远程对应分支的代码，并给予了相应的权限
       - add_ssh_keys:
           fingerprints:
             - "7a:d5:22:c4:74:d9:76:88:ca:18:22:aa:64:92:d7:be"
+#      捡出代码内容
       - checkout
+#      对构建过程 使用缓存进行优化
+      - restore_cache:
+          keys:
+            - dependencies_imooc
+#      安装依赖
       - run:
           name: Install
           command: yarn install
+      - save_cache:
+          paths:
+            - node_modules
+          key: dependencies_imooc
+#      进行构建 默认情况下vue会构建到dist目录下
       - run:
           name: Build
           command: yarn build
+      - run:
+          name: Prepare shell commands
+#           shell chmod + x 赋予执行权限
+#          执行shell脚本
+#          scripts/deploy.sh 配置的shell脚本
+          command: chmod +x scripts/deploy.sh
+      - run:
+          name: Run Deploy to Github pages
+          command: ./scripts/deploy.sh
